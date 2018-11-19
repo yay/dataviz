@@ -165,9 +165,24 @@ function setupCustomCubicMorph() {
         .delay(1000)
         .duration(7000)
         .attrTween('d', () => {
+            let ax: number[] = [];
+            let ay: number[] = [];
+            let bx: number[] = [];
+            let by: number[] = [];
+            cubicHeartPath.forEach((value, index) => {
+                index % 2 === 0 ? ax.push(value) : ay.push(value);
+            });
+            cubicSquareStarPath.forEach((value, index) => {
+                index % 2 === 0 ? bx.push(value) : by.push(value);
+            });
             return (t: number) => {
-                const value = arrayInterpolator.compute(cubicHeartPath, cubicSquareStarPath, t);
-                return Path.cubicPathToString(value);
+                const x: number[] = arrayInterpolator.compute(ax, bx, t);
+                const y: number[] = arrayInterpolator.compute(ay, by, t);
+                const xy: number[] = [];
+                x.forEach((value, index) => {
+                    xy.push(value, y[index]);
+                });
+                return Path.cubicPathToString(xy);
             };
         });
 }
@@ -189,9 +204,24 @@ function setupReverseCustomCubicMorph() {
         .delay(1000)
         .duration(7000)
         .attrTween('d', () => {
+            let ax: number[] = [];
+            let ay: number[] = [];
+            let bx: number[] = [];
+            let by: number[] = [];
+            cubicSquareStarPath.forEach((value, index) => {
+                index % 2 === 0 ? ax.push(value) : ay.push(value);
+            });
+            cubicHeartPath.forEach((value, index) => {
+                index % 2 === 0 ? bx.push(value) : by.push(value);
+            });
             return (t: number) => {
-                const value = arrayInterpolator.compute(cubicSquareStarPath, cubicHeartPath, t);
-                return Path.cubicPathToString(value);
+                const x: number[] = arrayInterpolator.compute(ax, bx, t);
+                const y: number[] = arrayInterpolator.compute(ay, by, t);
+                const xy: number[] = [];
+                x.forEach((value, index) => {
+                    xy.push(value, y[index]);
+                });
+                return Path.cubicPathToString(xy);
             };
         });
 }
