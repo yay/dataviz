@@ -14,9 +14,10 @@ type Padding = {
     left: number
 };
 
-// type SvgSelection = d3.Selection<SVGSVGElement, {}, HTMLElement, any>;
-type SvgElementSelection = d3.Selection<SVGGElement, {}, null, any>;
+type SvgSelection = d3.Selection<SVGSVGElement, {}, null, undefined>;
+type SvgGroupSelection = d3.Selection<SVGGElement, {}, null, any>;
 type SvgPathSelection = d3.Selection<SVGPathElement, {}, null, any>;
+type SvgTextSelection = d3.Selection<SVGTextElement, {}, null, any>;
 
 export default class TimeValueChart {
     constructor(parent?: HTMLElement) {
@@ -42,17 +43,12 @@ export default class TimeValueChart {
         this.updateCoreSize();
     }
 
-    private svg: d3.Selection<SVGSVGElement, {}, null, undefined>;
-    private group: SvgElementSelection;
-    private titleSelection: d3.Selection<SVGTextElement, {}, null, any>;
-    private xAxisGroup: SvgElementSelection;
-    private yAxisGroup: SvgElementSelection;
-    private linePath: d3.Selection<SVGPathElement, {}, null, any>;
-    // private bisectDate = d3.bisector((datum: any) => datum[this._xField]).left;
-
-    // crosshairLine(x1: number, y1: number, x2: number, y2: number) {
-    //     return `M${x1},${y1}L${x2},${y2}`;
-    // }
+    private svg: SvgSelection;
+    private group: SvgGroupSelection;
+    private titleSelection: SvgTextSelection;
+    private xAxisGroup: SvgGroupSelection;
+    private yAxisGroup: SvgGroupSelection;
+    private linePath: SvgPathSelection;
 
     set title(value: string) {
         this.titleSelection.text(value);
