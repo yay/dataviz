@@ -80,21 +80,19 @@ export const color: AnimationValue = {
     }
 };
 
-// export const path: AnimationValue = {
-//     normalize(a: Path, b: Path): [number[], number[]] {
-//         const aCubics = a.toCubicPaths();
-//         const bCubics = a.toCubicPaths();
-//         const aCount = aCubics.length;
-//         const bCount = bCubics.length;
-//
-//         for (let i = aCount; i < bCount; i++) {
-//         }
-//
-//     },
-//     compute(a: number, b: number, t: number): number {
-//         return 0;
-//     }
-// };
+export const path: AnimationValue = {
+    normalize(a: Path, b: Path): [number[][], number[][]] {
+        const aCubics: number[][] = a.toCubicPaths();
+        const bCubics: number[][] = a.toCubicPaths();
+        const aCount = aCubics.length;
+        const bCount = bCubics.length;
+
+        return [aCubics, bCubics];
+    },
+    compute(a: number[][], b: number[][], t: number): number[][] {
+        return [];
+    }
+};
 
 export const values = {
     array,

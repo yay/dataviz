@@ -6,8 +6,6 @@ import { line } from 'd3-shape';
 import * as axis from 'd3-axis';
 // TODO: be explicit about imports (when done prototyping)
 import * as d3 from 'd3';
-import {BaseType} from 'd3';
-import { runInThisContext } from 'vm';
 
 type Padding = {
     top: number,
@@ -189,7 +187,6 @@ export default class TimeValueChart {
     }
 
     render() {
-        // const transition = d3.transition().duration(500);
         this.xAxisGroup
             .attr('transform', `translate(0,${this.coreHeight})`)
             .call(this._xAxis);

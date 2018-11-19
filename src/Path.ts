@@ -642,10 +642,12 @@ export default class Path {
     }
 
     /**
-     * Returns an array of paths, where each path consists exclusively of cubic segments,
-     * represented as x/y components of their control points.
+     * Returns an array of sub-paths of this Path,
+     * where each sub-path is represented exclusively by cubic segments.
      */
     toCubicPaths(): number[][] {
+        // Each sub-path is an array of `(n * 3 + 1) * 2` numbers,
+        // where `n` is the number of segments.
         const paths: number[][] = [];
         const params = this.params;
 
