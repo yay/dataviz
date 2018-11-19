@@ -700,4 +700,12 @@ export default class Path {
 
         return paths;
     }
+
+    static cubicPathToString(path: number[]): string {
+        const n = path.length;
+        if (!(n % 2 === 0 && (n / 2 - 1) / 2 >= 1)) {
+            throw new Error('Invalid path.');
+        }
+        return 'M' + path.slice(0, 2).join(',') + 'C' + path.slice(2).join(',');
+    }
 }

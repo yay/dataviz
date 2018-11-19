@@ -1,6 +1,6 @@
 import Path from "./Path";
 
-interface AnimationValue {
+interface Interpolator {
     /**
      * Normalizes the `a` and `b` to a common form.
      * For example, there may be many different representations
@@ -41,14 +41,14 @@ function interpolate(a: number, b: number, t: number): number {
     return a + (b - a) * t;
 }
 
-export const array: AnimationValue = {
+export const array: Interpolator = {
     compute(A: number[], B: number[], t: number): number[] {
         const lastAi = A.length - 1;
         const lastBi = B.length - 1;
-        const outLength = Math.max(lastAi, lastBi) + 1;
-        const out = [];
+        const n = Math.max(lastAi, lastBi) + 1;
+        const result = [];
 
-        for (let i = 0; i < outLength; i++) {
+        for (let i = 0; i < n; i++) {
             let a = A[Math.min(i, lastAi)];
             let b = B[Math.min(i, lastBi)];
 
@@ -57,19 +57,19 @@ export const array: AnimationValue = {
             }
 
             if (isFinite(a)) {
-                out[i] = a + (b - a) * t;
+                result[i] = a + (b - a) * t;
             } else {
-                out[i] = b;
+                result[i] = b;
             }
         }
 
-        return out;
+        return result;
     }
 };
 
 type ColorComponents = [number, number, number, number];
 
-export const color: AnimationValue = {
+export const color: Interpolator = {
     compute(a: ColorComponents, b: ColorComponents, t: number): ColorComponents {
         return [
             interpolate(a[0], b[0], t),
@@ -80,7 +80,7 @@ export const color: AnimationValue = {
     }
 };
 
-export const path: AnimationValue = {
+export const path: Interpolator = {
     normalize(a: Path, b: Path): [number[][], number[][]] {
         const aCubics: number[][] = a.toCubicPaths();
         const bCubics: number[][] = a.toCubicPaths();
@@ -92,10 +92,4 @@ export const path: AnimationValue = {
     compute(a: number[][], b: number[][], t: number): number[][] {
         return [];
     }
-};
-
-export const values = {
-    array,
-    color,
-    // path
 };

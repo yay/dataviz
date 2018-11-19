@@ -2,6 +2,7 @@ import Path from './Path';
 import { timeParse } from 'd3-time-format';
 import * as d3 from 'd3';
 import TimeValueChart from './TimeValueChart';
+import { array as arrayInterpolator } from './Interpolator';
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -75,6 +76,9 @@ function onDataReady(records: DatePrice[]) {
 
     setupD3Morph();
     setupCustomMorph();
+    setupCubicMorph();
+    setupCustomCubicMorph();
+    setupReverseCustomCubicMorph();
 }
 
 const shapes = {
@@ -84,6 +88,7 @@ const shapes = {
 };
 const shapeStyle = 'fill:none; stroke:#000; stroke-width:2px;';
 
+// Standard D3 transition.
 function setupD3Morph() {
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
@@ -98,6 +103,7 @@ function setupD3Morph() {
         .attr('d', shapes.squareStar);
 }
 
+// Convert the path to use only M, L, C, Z commands (no relative commands).
 function setupCustomMorph() {
     const heartPath = Path.fromString(shapes.heart);
     const squareStarPath = Path.fromString(shapes.squareStar);
@@ -115,4 +121,77 @@ function setupCustomMorph() {
         .delay(1000)
         .duration(2000)
         .attr('d', squareStarPath.toString());
+}
+
+// Convert the path to use only (absolute) cubic curves.
+function setupCubicMorph() {
+    const heartPath = Path.cubicPathToString(
+        Path.fromString(shapes.heart).toCubicPaths()[0]
+    );
+    const squareStarPath = Path.cubicPathToString(
+        Path.fromString(shapes.squareStar).toCubicPaths()[0]
+    );
+
+    d3.scaleLinear();
+
+    const svg = d3.select(document.body).append('svg')
+        .attr('width', 600)
+        .attr('height', 400);
+    const g = svg.append('g');
+    g.append('path')
+        .attr('d', heartPath)
+        .attr('style', shapeStyle)
+        .transition()
+        .delay(1000)
+        .duration(2000)
+        .attr('d', squareStarPath);
+}
+
+// As the above example, but with custom path interpolator.
+function setupCustomCubicMorph() {
+    const cubicHeartPath = Path.fromString(shapes.heart).toCubicPaths()[0];
+    const cubicSquareStarPath = Path.fromString(shapes.squareStar).toCubicPaths()[0];
+
+    d3.scaleLinear();
+
+    const svg = d3.select(document.body).append('svg')
+        .attr('width', 600)
+        .attr('height', 400);
+    const g = svg.append('g');
+    g.append('path')
+        .attr('d', Path.cubicPathToString(cubicHeartPath))
+        .attr('style', shapeStyle)
+        .transition()
+        .delay(1000)
+        .duration(7000)
+        .attrTween('d', () => {
+            return (t: number) => {
+                const value = arrayInterpolator.compute(cubicHeartPath, cubicSquareStarPath, t);
+                return Path.cubicPathToString(value);
+            };
+        });
+}
+
+function setupReverseCustomCubicMorph() {
+    const cubicHeartPath = Path.fromString(shapes.heart).toCubicPaths()[0];
+    const cubicSquareStarPath = Path.fromString(shapes.squareStar).toCubicPaths()[0];
+
+    d3.scaleLinear();
+
+    const svg = d3.select(document.body).append('svg')
+        .attr('width', 600)
+        .attr('height', 400);
+    const g = svg.append('g');
+    g.append('path')
+        .attr('d', Path.cubicPathToString(cubicSquareStarPath))
+        .attr('style', shapeStyle)
+        .transition()
+        .delay(1000)
+        .duration(7000)
+        .attrTween('d', () => {
+            return (t: number) => {
+                const value = arrayInterpolator.compute(cubicSquareStarPath, cubicHeartPath, t);
+                return Path.cubicPathToString(value);
+            };
+        });
 }
