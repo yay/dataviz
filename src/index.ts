@@ -2,7 +2,7 @@ import Path from './Path';
 import { timeParse } from 'd3-time-format';
 import * as d3 from 'd3';
 import TimeValueChart from './TimeValueChart';
-import { array as arrayInterpolator } from './Interpolator';
+import { path as pathInterpolator } from './Interpolator';
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -112,8 +112,6 @@ function setupCustomMorph() {
     const heartPath = Path.fromString(shapes.heart);
     const squareStarPath = Path.fromString(shapes.squareStar);
 
-    d3.scaleLinear();
-
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
         .attr('height', 400);
@@ -136,8 +134,6 @@ function setupCubicMorph() {
         Path.fromString(shapes.squareStar).toCubicPaths()[0]
     );
 
-    d3.scaleLinear();
-
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
         .attr('height', 400);
@@ -153,117 +149,66 @@ function setupCubicMorph() {
 
 // As the above example, but with custom path interpolator.
 function setupCustomCubicMorph() {
-    const cubicHeartPath = Path.fromString(shapes.heart).toCubicPaths()[0];
-    const cubicSquareStarPath = Path.fromString(shapes.squareStar).toCubicPaths()[0];
-
-    d3.scaleLinear();
-
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
         .attr('height', 400);
     const g = svg.append('g');
     g.append('path')
-        .attr('d', Path.cubicPathToString(cubicHeartPath))
+        .attr('d', shapes.heart)
         .attr('style', shapeStyle)
         .transition()
         .delay(1000)
         .duration(7000)
         .attrTween('d', () => {
-            let ax: number[] = [];
-            let ay: number[] = [];
-            let bx: number[] = [];
-            let by: number[] = [];
-            cubicHeartPath.forEach((value, index) => {
-                index % 2 === 0 ? ax.push(value) : ay.push(value);
-            });
-            cubicSquareStarPath.forEach((value, index) => {
-                index % 2 === 0 ? bx.push(value) : by.push(value);
-            });
+            const [a, b] = pathInterpolator.normalize(
+                shapes.heart,
+                shapes.squareStar
+            );
             return (t: number) => {
-                const x: number[] = arrayInterpolator.compute(ax, bx, t);
-                const y: number[] = arrayInterpolator.compute(ay, by, t);
-                const xy: number[] = [];
-                x.forEach((value, index) => {
-                    xy.push(value, y[index]);
-                });
-                return Path.cubicPathToString(xy);
+                const value = pathInterpolator.compute(a, b, t);
+                return pathInterpolator.serve(value);
             };
         });
 }
 
 function setupReverseCustomCubicMorph() {
-    const cubicHeartPath = Path.fromString(shapes.heart).toCubicPaths()[0];
-    const cubicSquareStarPath = Path.fromString(shapes.squareStar).toCubicPaths()[0];
-
-    d3.scaleLinear();
-
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
         .attr('height', 400);
     const g = svg.append('g');
     g.append('path')
-        .attr('d', Path.cubicPathToString(cubicSquareStarPath))
+        .attr('d', shapes.squareStar)
         .attr('style', shapeStyle)
         .transition()
         .delay(1000)
         .duration(7000)
         .attrTween('d', () => {
-            let ax: number[] = [];
-            let ay: number[] = [];
-            let bx: number[] = [];
-            let by: number[] = [];
-            cubicSquareStarPath.forEach((value, index) => {
-                index % 2 === 0 ? ax.push(value) : ay.push(value);
-            });
-            cubicHeartPath.forEach((value, index) => {
-                index % 2 === 0 ? bx.push(value) : by.push(value);
-            });
+            const [a, b] = pathInterpolator.normalize(
+                shapes.heart,
+                shapes.squareStar
+            );
             return (t: number) => {
-                const x: number[] = arrayInterpolator.compute(ax, bx, t);
-                const y: number[] = arrayInterpolator.compute(ay, by, t);
-                const xy: number[] = [];
-                x.forEach((value, index) => {
-                    xy.push(value, y[index]);
-                });
-                return Path.cubicPathToString(xy);
+                const value = pathInterpolator.compute(b, a, t);
+                return pathInterpolator.serve(value);
             };
         });
 }
 
 function setupSliderMorph() {
-    const cubicHeartPath = Path.fromString(shapes.heart).toCubicPaths()[0];
-    const cubicBatPath = Path.fromString(shapes.bat).toCubicPaths()[0];
-
-    d3.scaleLinear();
-
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
         .attr('height', 400);
     d3.select(document.body).append('br');
     const g = svg.append('g');
     const path = g.append('path')
-        .attr('d', Path.cubicPathToString(cubicHeartPath))
+        .attr('d', shapes.heart)
         .attr('style', shapeStyle);
 
-    let ax: number[] = [];
-    let ay: number[] = [];
-    let bx: number[] = [];
-    let by: number[] = [];
-    cubicHeartPath.forEach((value, index) => {
-        index % 2 === 0 ? ax.push(value) : ay.push(value);
-    });
-    cubicBatPath.forEach((value, index) => {
-        index % 2 === 0 ? bx.push(value) : by.push(value);
-    });
+    const [a, b] = pathInterpolator.normalize(shapes.heart, shapes.bat);
 
     function interpolate(t: number): string {
-        const x: number[] = arrayInterpolator.compute(ax, bx, t);
-        const y: number[] = arrayInterpolator.compute(ay, by, t);
-        const xy: number[] = [];
-        x.forEach((value, index) => {
-            xy.push(value, y[index]);
-        });
-        return Path.cubicPathToString(xy);
+        const value = pathInterpolator.compute(a, b, t);
+        return pathInterpolator.serve(value);
     }
 
     d3.select(document.body).append('input')
