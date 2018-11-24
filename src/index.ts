@@ -3,6 +3,10 @@ import { timeParse } from 'd3-time-format';
 import * as d3 from 'd3';
 import TimeValueChart from './TimeValueChart';
 import { path as pathInterpolator } from './Interpolator';
+import * as topojson from 'topojson-client';
+import topoUSA from '../data/topoUSA';
+import topoGlobe from '../data/topoGlobe';
+import * as canvas from './Canvas';
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -45,6 +49,18 @@ function main() {
 }
 
 function onDataReady(records: DatePrice[]) {
+    // setupChart(records);
+    // setupD3Morph();
+    // setupCustomMorph();
+    // setupCubicMorph();
+    // setupCustomCubicMorph();
+    // setupReverseCustomCubicMorph();
+    // setupSliderMorph();
+    setupGeoCanvas();
+    setupGlobe();
+}
+
+function setupChart(records: DatePrice[]) {
     const chart = new TimeValueChart();
     chart.title = '1 ounce of gold (USD)';
     chart.xField = 'date';
@@ -73,13 +89,6 @@ function onDataReady(records: DatePrice[]) {
                 chart.data = records;
             });
     };
-
-    setupD3Morph();
-    setupCustomMorph();
-    setupCubicMorph();
-    setupCustomCubicMorph();
-    setupReverseCustomCubicMorph();
-    setupSliderMorph();
 }
 
 const shapes = {
@@ -221,4 +230,79 @@ function setupSliderMorph() {
         .on('input', function () {
             path.attr('d', interpolate(+this.value));
         });
+}
+
+function setupGeoCanvas() {
+    const geoCanvas = d3.select(document.body).append('canvas')
+        .attr('width', 960)
+        .attr('height', 600);
+    canvas.setDevicePixelRatio(geoCanvas.node()!);
+    const ctx = geoCanvas.node()!.getContext('2d')!;
+    const path = d3.geoPath().context(ctx);
+
+    ctx.beginPath();
+    path(topojson.mesh(topoUSA));
+    ctx.stroke();
+}
+
+function setupGlobe() {
+    // Set the dimensions of the map
+    let width  = 960,
+        height = 480,
+        speed = 1e-2;
+
+    let globeCanvas = d3.select(document.body).append('canvas')
+            .attr('width', 960)
+            .attr('height', 600),
+        ctx = globeCanvas.node()!.getContext('2d')!;
+
+    canvas.setDevicePixelRatio(globeCanvas.node()!);
+
+    // Create and configure a geographic projection
+    let projection = d3.geoOrthographic()
+        .scale(height / 2)
+        .clipAngle(90)
+        .translate([width / 2, height / 2])
+        .precision(0.1);
+
+    // Create and configure a path generator
+    let pathGenerator = d3.geoPath()
+        .projection(projection)
+        .context(ctx);
+
+    // Create and configure the graticule generator (one line every 20 degrees)
+    let graticule = d3.geoGraticule();
+
+    // Background
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(0, 0, width, height);
+
+    // Rotate the globe
+    d3.timer(function(elapsed) {
+
+        projection.rotate([speed * elapsed, 30, 15]);
+
+        // Canvas Drawing
+        ctx.clearRect(0, 0, width, height);
+
+        // Sphere
+        ctx.beginPath();
+        pathGenerator({type: 'Sphere'});
+        ctx.strokeStyle = "#666";
+        ctx.stroke();
+        ctx.fillStyle = '#eee';
+        ctx.fill();
+
+        // Graticule
+        ctx.beginPath();
+        pathGenerator(graticule());
+        ctx.strokeStyle = "#666";
+        ctx.stroke();
+
+        // Countries
+        ctx.beginPath();
+        pathGenerator(topoGlobe);
+        ctx.fillStyle = "#999";
+        ctx.fill();
+    });
 }
