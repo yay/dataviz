@@ -4,9 +4,10 @@ import * as d3 from 'd3';
 import TimeValueChart from './TimeValueChart';
 import { path as pathInterpolator } from './Interpolator';
 import * as topojson from 'topojson-client';
-import topoUSA from '../data/topoUSA';
-import topoGlobe from '../data/topoGlobe';
+// import topoUSA from '../data/topoUSA';
+// import topoGlobe from '../data/topoGlobe';
 import * as canvas from './Canvas';
+import AnimationQueue from './AnimationQueue';
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -55,9 +56,9 @@ function onDataReady(records: DatePrice[]) {
     // setupCubicMorph();
     // setupCustomCubicMorph();
     // setupReverseCustomCubicMorph();
-    // setupSliderMorph();
-    setupGeoCanvas();
-    setupGlobe();
+    setupSliderMorph();
+    // setupGeoCanvas();
+    // setupGlobe();
 }
 
 function setupChart(records: DatePrice[]) {
