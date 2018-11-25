@@ -8,6 +8,7 @@ import * as topojson from 'topojson-client';
 // import topoGlobe from '../data/topoGlobe';
 import * as canvas from './Canvas';
 import AnimationQueue from './AnimationQueue';
+import easings from './Easings';
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -56,6 +57,7 @@ function onDataReady(records: DatePrice[]) {
     // setupCubicMorph();
     // setupCustomCubicMorph();
     // setupReverseCustomCubicMorph();
+    setupCustomAnimation();
     setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
@@ -94,6 +96,7 @@ function setupChart(records: DatePrice[]) {
 
 const shapes = {
     circle: 'M233.652,44.215c58.786,-0.147 106.513,47.727 106.513,106.512c0,58.786 -47.727,106.513 -106.513,106.513c-58.785,0 -106.512,-47.727 -106.512,-106.513c0,-58.785 47.8,-106.366 106.512,-106.512Z',
+    square: 'M127.005,43.782h213.508v213.508h-213.508v-213.508',
     squareStar: 'M262.602,50.377l57.52,41.791l-28.76,39.585l46.535,15.12l-21.971,67.618l-46.535,-15.12l0,48.93l-71.098,0l0,-48.93l-46.535,15.12l-21.971,-67.618l46.535,-15.12l-28.76,-39.585l57.52,-41.791l28.76,39.585l28.76,-39.585Z',
     heart: 'M233.28,102.888c20.1,-38.191 60.301,-38.191 80.401,-19.095c20.101,19.095 20.101,57.286 0,95.476c-14.07,28.643 -50.25,57.286 -80.401,76.381c-30.15,-19.095 -66.331,-47.738 -80.401,-76.381c-20.1,-38.19 -20.1,-76.381 0,-95.476c20.1,-19.096 60.301,-19.096 80.401,19.095Z',
     superHeart: 'M233.28,102.888c9.639,-18.313 23.899,-27.845 38.349,-30.7c15.684,-3.1 31.59,1.666 42.052,11.605c11.753,11.164 16.634,28.855 14.644,49.258c-1.414,14.494 -6.295,30.356 -14.644,46.218c-7.1,14.454 -19.831,28.909 -34.576,42.136c-14.475,12.984 -30.89,24.786 -45.825,34.245c-13.898,-8.802 -29.078,-19.633 -42.783,-31.558c-16.025,-13.944 -30.034,-29.383 -37.618,-44.823c-8.146,-15.478 -12.991,-30.955 -14.534,-45.162c-2.265,-20.847 2.58,-38.958 14.534,-50.314c11.619,-11.039 29.955,-15.696 47.242,-10.284c12.619,3.95 24.678,13.265 33.159,29.379Z',
@@ -181,6 +184,40 @@ function setupCustomCubicMorph() {
         });
 }
 
+function setupCustomAnimation() {
+    const node: SVGPathElement = d3.select(document.body).append('svg')
+        .attr('width', 480)
+        .attr('height', 320)
+        .append('g').append('path')
+        .attr('d', shapes.circle)
+        .attr('style', shapeStyle).node()!;
+
+    const [a, b] = pathInterpolator.normalize(
+        shapes.circle,
+        shapes.square
+    );
+    function interpolate(t: number) {
+        const value = pathInterpolator.compute(a, b, t);
+        node.setAttribute('d', pathInterpolator.serve(value));
+    };
+
+    const delay = 1000;
+    setTimeout(() => {
+        const duration = 2000; // ms
+        const startTime = Date.now();
+        function onFrame() {
+            const now = Date.now();
+            const t = Math.min(now - startTime, duration) / duration;
+            // interpolate(easings.elasticOut(t));
+            interpolate(easings.bounceOut(t));
+            if (t < 1) {
+                requestAnimationFrame(onFrame);
+            }
+        }
+        requestAnimationFrame(onFrame);
+    }, delay);
+}
+
 function setupReverseCustomCubicMorph() {
     const svg = d3.select(document.body).append('svg')
         .attr('width', 600)
@@ -205,10 +242,11 @@ function setupReverseCustomCubicMorph() {
 }
 
 function setupSliderMorph() {
-    const svg = d3.select(document.body).append('svg')
-        .attr('width', 600)
-        .attr('height', 400);
-    d3.select(document.body).append('br');
+    const div = d3.select(document.body).append('div');
+    const svg = div.append('svg')
+        .attr('width', 480)
+        .attr('height', 320);
+    div.append('br');
     const g = svg.append('g');
     const path = g.append('path')
         .attr('d', shapes.heart)
@@ -221,13 +259,13 @@ function setupSliderMorph() {
         return pathInterpolator.serve(value);
     }
 
-    d3.select(document.body).append('input')
+    div.append('input')
         .attr('type', 'range')
         .attr('value', 0)
         .attr('min', 0)
         .attr('max', 1)
         .attr('step', 0.002)
-        .attr('style', 'width: 500px; margin-left: 30px;')
+        .attr('style', 'width: 480px')
         .on('input', function () {
             path.attr('d', interpolate(+this.value));
         });
@@ -277,10 +315,13 @@ function setupGlobe() {
     // Background
     ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, width, height);
+    ctx.font = '32px Verdana';
+    ctx.textBaseline = 'middle';
+    const text = 'The World Is Turning!';
+    const textWidth = ctx.measureText(text).width;
 
     // Rotate the globe
     d3.timer(function(elapsed) {
-
         projection.rotate([speed * elapsed, 30, 15]);
 
         // Canvas Drawing
@@ -305,5 +346,8 @@ function setupGlobe() {
         pathGenerator(topoGlobe);
         ctx.fillStyle = "#999";
         ctx.fill();
+
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillText(text, (width - textWidth) / 2, height / 2);
     });
 }
