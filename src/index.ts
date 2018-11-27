@@ -9,6 +9,7 @@ import * as topojson from 'topojson-client';
 import * as canvas from './Canvas';
 import AnimationQueue from './AnimationQueue';
 import easings from './Easings';
+import './decoratorTest';
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -51,14 +52,14 @@ function main() {
 }
 
 function onDataReady(records: DatePrice[]) {
-    // setupChart(records);
-    // setupD3Morph();
+    setupChart(records);
+    setupD3Morph();
     // setupCustomMorph();
     // setupCubicMorph();
     // setupCustomCubicMorph();
     // setupReverseCustomCubicMorph();
-    setupCustomAnimation();
-    setupSliderMorph();
+    // setupCustomAnimation();
+    // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
 }
@@ -72,6 +73,7 @@ function setupChart(records: DatePrice[]) {
 
     const button = document.createElement('button');
     button.innerText = 'Change data set';
+    button.style.marginTop = '850px';
     document.body.appendChild(button);
     document.body.appendChild(document.createElement('br'));
     button.onclick = () => {

@@ -1,4 +1,4 @@
-import { scaleLinear, scaleTime } from 'd3-scale';
+import {ScaleContinuousNumeric, scaleLinear, scaleTime} from 'd3-scale';
 import { extent } from 'd3-array';
 import { timeFormat } from 'd3-time-format';
 import { format } from 'd3-format';
@@ -6,6 +6,7 @@ import { line } from 'd3-shape';
 import * as axis from 'd3-axis';
 // TODO: be explicit about imports (when done prototyping)
 import * as d3 from 'd3';
+import { setDevicePixelRatio } from './Canvas';
 
 type Padding = {
     top: number,
@@ -14,19 +15,129 @@ type Padding = {
     left: number
 };
 
+interface IRenderable {
+    render(ctx: CanvasRenderingContext2D): void
+}
+
+abstract class Sprite implements IRenderable {
+    // dirty = false;
+
+    canvasAttributes = {
+        fillStyle: <string | CanvasGradient | CanvasPattern>'red',
+        strokeStyle: <string | CanvasGradient | CanvasPattern>'black',
+        lineWidth: <number>2,
+        lineDash: <number[]>[],
+        lineCap: <CanvasLineCap>'butt'
+    };
+
+    render(ctx: CanvasRenderingContext2D) {
+        for (const name in this.canvasAttributes) {
+            (<any>ctx)[name] = (<any>this.canvasAttributes)[name];
+        }
+    }
+}
+
+class Circle extends Sprite {
+    x = 0;
+    y = 0;
+    r = 5;
+
+    render(ctx: CanvasRenderingContext2D) {
+        super.render(ctx);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+}
+
+class Rect extends Sprite {
+    // Coordinates of the center of the rectangle.
+    x = 0;
+    y = 0;
+    width = 10;
+    height = 10;
+
+    render(ctx: CanvasRenderingContext2D) {
+        super.render(ctx);
+        const dx = this.width / 2;
+        const dy = this.height / 2;
+        ctx.beginPath();
+        ctx.moveTo(this.x - dx, this.y - dy);
+        ctx.lineTo(this.x + dx, this.y - dy);
+        ctx.lineTo(this.x + dx, this.y + dy);
+        ctx.lineTo(this.x - dx, this.y + dy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+}
+
+class CartesianSeries implements IRenderable {
+    xAxis?: axis.Axis<number | Date | { valueOf(): number }>;
+    yAxis?: axis.Axis<number | Date | { valueOf(): number }>;
+    xField = 'x';
+    yField = 'y';
+
+    data: any[] = [];
+
+    chart?: TimeValueChart;
+
+    constructor(chart: TimeValueChart) {
+        this.chart = chart;
+    }
+
+    render(ctx: CanvasRenderingContext2D) {}
+}
+
+class ScatterSeries extends CartesianSeries {
+    private instance = new Rect();
+
+    constructor(chart: TimeValueChart) {
+        super(chart);
+        // this.instance.r = 3;
+    }
+
+
+    render(ctx: CanvasRenderingContext2D) {
+        if (!this.chart) return;
+        const data = this.chart.data;
+        const x = this.xAxis!.scale();
+        const y = this.yAxis!.scale();
+        const xField = this.xField;
+        const yField = this.yField;
+
+        this.data.forEach(record => {
+            let xValue: number = record[xField];
+            let yValue: number = record[yField];
+            let xCoord = x(xValue) || 0;
+            let yCoord = y(yValue) || 0;
+
+            this.instance.x = xCoord;
+            this.instance.y = yCoord;
+            this.instance.render(ctx);
+        });
+    }
+}
+
 type SvgSelection = d3.Selection<SVGSVGElement, {}, null, undefined>;
 type SvgGroupSelection = d3.Selection<SVGGElement, {}, null, any>;
 type SvgPathSelection = d3.Selection<SVGPathElement, {}, null, any>;
 type SvgTextSelection = d3.Selection<SVGTextElement, {}, null, any>;
 
 export default class TimeValueChart {
+
+    series = new ScatterSeries(this);
+
     constructor(parent?: HTMLElement) {
         if (!parent) {
             parent = document.createElement('div');
             document.body.appendChild(parent);
         }
 
-        this.svg = d3.select(parent).append('svg');
+        this.svg = d3.select(parent).append('svg')
+            .style('position', 'absolute');
         this.group = this.svg.append('g');
         this.titleSelection = this.svg.append('text')
             .attr('class', 'title')
@@ -40,8 +151,18 @@ export default class TimeValueChart {
         this.yAxisGroup = this.group.append('g')
             .attr('class', 'y axis');
 
+        this.canvas = d3.select(parent).append('canvas')
+            .style('position', 'absolute');
+        this.ctx = this.canvas.node()!.getContext('2d')!;
+
+        this.series.xAxis = this._xAxis;
+        this.series.yAxis = this._yAxis;
+
         this.updateCoreSize();
     }
+
+    private canvas: d3.Selection<HTMLCanvasElement, {}, null, any>;
+    private readonly ctx: CanvasRenderingContext2D;
 
     private svg: SvgSelection;
     private group: SvgGroupSelection;
@@ -60,19 +181,25 @@ export default class TimeValueChart {
     _data: any[] = [];
     set data(value: any[]) {
         this._data = value;
+        this.series.data = value;
         this.coordinate();
         this.render();
+    }
+    get data(): any[] {
+        return this._data;
     }
 
     _xField: string = 'time';
     set xField(value: string) {
         this._xField = value;
+        this.series.xField = value;
         // this.coordinate();
     }
 
     _yField: string = 'value';
     set yField(value: string) {
         this._yField = value;
+        this.series.yField = value;
         // this.coordinate();
     }
 
@@ -82,13 +209,13 @@ export default class TimeValueChart {
     private coreWidth: number = 0;
     private coreHeight: number = 0;
 
-    private _width: number = 640;
+    private _width: number = 1200;
     set width(value: number) {
         this._width = value;
         this.updateCoreSize();
     }
 
-    private _height: number = 480;
+    private _height: number = 800;
     set height(value: number) {
         this._height = value;
         this.updateCoreSize();
@@ -145,6 +272,14 @@ export default class TimeValueChart {
             .attr('x', this.coreWidth / 2)
             .attr('y', this._padding.top / 2);
         this._yAxis.tickSizeInner(-this.coreWidth);
+
+        this.canvas
+            .attr('width', this._width)
+            .attr('height', this._height);
+        setDevicePixelRatio(this.canvas.node()!);
+        this.ctx.resetTransform();
+        this.ctx.translate(this._padding.left, this._padding.top);
+
         this.render();
     }
 
@@ -189,9 +324,33 @@ export default class TimeValueChart {
         this.yAxisGroup
             .call(this._yAxis);
 
-        this.linePath
-            .datum(this._data)
-            .attr('d', this.lineGenerator)
-            .call(<any>this.pathTransition);
+        // this.linePath
+        //     .datum(this._data)
+        //     .attr('d', this.lineGenerator)
+        //     .call(<any>this.pathTransition);
+
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this._width, this._height);
+
+
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255,0,0,0.3)';
+        ctx.fillStyle = 'white';
+        // ctx.setLineDash([3, 3]);
+        const x = this.xScale;
+        const y = this.yScale;
+        const xField = this._xField;
+        const yField = this._yField;
+        ctx.beginPath();
+        this._data.forEach((datum, index) => {
+            ctx[index ? 'lineTo' : 'moveTo'](
+                x(datum[xField]),
+                y(datum[yField])
+            );
+        });
+        ctx.stroke();
+
+        this.series.render(ctx);
     }
 }

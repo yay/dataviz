@@ -1,0 +1,43 @@
+ - Canvas engine only
+
+ - Don't have to implement the Matrix class manually, the 3x3 SVGMatrix is deprecated now.
+   Can use the 4x4 DOMMatrix all the way. DOMMatrix components are 64-bit floating point number,
+   not 32-bit floats like before, so shouldn't have any precision issues. Nor precision compensation
+   logic is needed in our code.
+
+   That said, if we ever decide to go the same route and build the charts on top of a Draw layer,
+   like in Sencha Charts. I think, D3 scales will make for a simpler system.
+
+ - D3-like scales with domain/range
+   linear scale, log scale, time scale, category scale
+
+ - Axis that use the scales to render ticks. Have a scale have the `tick` method
+   to segment the range nicely, like round it up a bit to have a certain number of
+   segments, for example, if the range of data is 40 to 960, the displayed range
+   could be 0 to 1000, so that we can have 10 horizontal grid lines at regular intervals,
+   even near the top and bottom of the chart.
+
+   Axes can render themselves instead of setting up some sprite primitive to do the actual
+   rendering. But then how do we animate the attributes of the axis that allow animation?
+   It's going to be ugly. Like we'll set position of something to 100 and will incrementally
+   be updated to arrive at 100, instead of being 100 right away while some backing sprite
+   has it's `left` attribute set over time for the duration of the animation. If somewhere
+   mid-animation you decide to query the position, it will be 100, or if we set position back to 0,
+   the sprite will start moving left again from where it currently is.
+   So it makes sense to use primitives/sprites anyway
+
+ - Grid lines (can be part of the axes, like very lock ticks going in the opposite direction)
+
+ - Series
+
+ - Legend
+   * series themselves
+   * name of the series
+   * visibility flag
+   * marker (icon) associated with the series (true, false or a sprite)
+
+ - Polar and Cartesian series
+
+ - Themes?
+ - Interactions?
+ - Captions?
