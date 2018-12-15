@@ -6,7 +6,7 @@ import { line } from 'd3-shape';
 import * as axis from 'd3-axis';
 // TODO: be explicit about imports (when done prototyping)
 import * as d3 from 'd3';
-import { setDevicePixelRatio } from './Canvas';
+import {HdpiCanvas} from "./HdpiCanvas";
 
 type Padding = {
     top: number,
@@ -23,16 +23,16 @@ abstract class Sprite implements IRenderable {
     // dirty = false;
 
     canvasAttributes = {
-        fillStyle: <string | CanvasGradient | CanvasPattern>'red',
-        strokeStyle: <string | CanvasGradient | CanvasPattern>'black',
-        lineWidth: <number>2,
-        lineDash: <number[]>[],
-        lineCap: <CanvasLineCap>'butt'
+        fillStyle: 'red' as string | CanvasGradient | CanvasPattern,
+        strokeStyle: 'black' as string | CanvasGradient | CanvasPattern,
+        lineWidth: 2 as number,
+        lineDash: [] as number[],
+        lineCap: 'butt' as CanvasLineCap
     };
 
     render(ctx: CanvasRenderingContext2D) {
         for (const name in this.canvasAttributes) {
-            (<any>ctx)[name] = (<any>this.canvasAttributes)[name];
+            (ctx as any)[name] = (this.canvasAttributes as any)[name];
         }
     }
 }
@@ -151,9 +151,11 @@ export default class TimeValueChart {
         this.yAxisGroup = this.group.append('g')
             .attr('class', 'y axis');
 
-        this.canvas = d3.select(parent).append('canvas')
-            .style('position', 'absolute');
-        this.ctx = this.canvas.node()!.getContext('2d')!;
+        this.hdpiCanvas = new HdpiCanvas();
+        this.hdpiCanvas.canvas.style.position = 'absolute';
+        parent.appendChild(this.hdpiCanvas.canvas);
+        this.canvas = d3.select(this.hdpiCanvas.canvas);
+        this.ctx = this.hdpiCanvas.canvas.getContext('2d')!;
 
         this.series.xAxis = this._xAxis;
         this.series.yAxis = this._yAxis;
@@ -161,6 +163,7 @@ export default class TimeValueChart {
         this.updateCoreSize();
     }
 
+    private hdpiCanvas: HdpiCanvas;
     private canvas: d3.Selection<HTMLCanvasElement, {}, null, any>;
     private readonly ctx: CanvasRenderingContext2D;
 
@@ -230,7 +233,7 @@ export default class TimeValueChart {
     set padding(value: Padding | [number, number, number, number] | number) {
         if (typeof value === 'object') {
             const padding = this._padding;
-            value = <Padding>value;
+            value = value as Padding;
             this._padding = {
                 top: isFinite(value.top) ? value.top : padding.top,
                 right: isFinite(value.right) ? value.right : padding.right,
@@ -273,10 +276,7 @@ export default class TimeValueChart {
             .attr('y', this._padding.top / 2);
         this._yAxis.tickSizeInner(-this.coreWidth);
 
-        this.canvas
-            .attr('width', this._width)
-            .attr('height', this._height);
-        setDevicePixelRatio(this.canvas.node()!);
+        this.hdpiCanvas.resize(this._width, this._height);
         this.ctx.resetTransform();
         this.ctx.translate(this._padding.left, this._padding.top);
 
@@ -299,8 +299,8 @@ export default class TimeValueChart {
             const xField = this._xField;
             const yField = this._yField;
             // TODO: check and throw if invalid
-            const xDomain = <[Date, Date]>extent(this._data, d => <Date>d[xField]);
-            const yDomain = <[number, number]>extent(this._data, d => <number>d[yField]);
+            const xDomain = extent(this._data, d => d[xField] as Date) as [Date, Date];
+            const yDomain = extent(this._data, d => d[yField] as number) as [number, number];
 
             this.xScale.domain(xDomain).nice();
             this.yScale.domain(yDomain).nice();

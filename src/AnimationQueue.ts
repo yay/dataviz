@@ -5,7 +5,7 @@
 const AnimationQueue = {
     frameCallbackId: 0,
     startTime: Date.now(),
-    queue: <IArguments[]>[],
+    queue: [] as IArguments[],
 
     add(fn: {(): void}, scope?: any, args?: any[]) {
         this.queue.push(arguments);

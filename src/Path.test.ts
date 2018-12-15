@@ -1,4 +1,4 @@
-import Path from './Path';
+import {Path} from './Path';
 import { writeFile } from 'fs';
 
 function savePath(fileName: string, path: Path) {

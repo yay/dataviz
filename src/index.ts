@@ -1,4 +1,4 @@
-import Path from './Path';
+import {Path} from './Path';
 import { timeParse } from 'd3-time-format';
 import * as d3 from 'd3';
 import TimeValueChart from './TimeValueChart';
@@ -6,10 +6,12 @@ import { path as pathInterpolator } from './Interpolator';
 import * as topojson from 'topojson-client';
 // import topoUSA from '../data/topoUSA';
 // import topoGlobe from '../data/topoGlobe';
-import * as canvas from './Canvas';
+import {HdpiCanvas} from "./HdpiCanvas";
 import AnimationQueue from './AnimationQueue';
 import easings from './Easings';
 import './decoratorTest';
+import {Scene} from "./scene/Scene";
+import {Rect} from "./scene/Rect";
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -46,14 +48,14 @@ function main() {
                 record.date = parseTime(record.date);
                 record.price = parseFloat(record.price);
             });
-            return <DatePrice[]>json;
+            return json as DatePrice[];
         })
         .then(onDataReady);
 }
 
 function onDataReady(records: DatePrice[]) {
-    setupChart(records);
-    setupD3Morph();
+    // setupChart(records);
+    // setupD3Morph();
     // setupCustomMorph();
     // setupCubicMorph();
     // setupCustomCubicMorph();
@@ -62,6 +64,26 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
+    testScene();
+}
+
+function testScene() {
+    const scene = new Scene(document.body);
+    const rect = new Rect();
+    rect.x = 50;
+    rect.y = 50;
+    rect.width = 200;
+    rect.height = 100;
+    scene.root = rect;
+
+    setTimeout(() => {
+        rect.height = 200;
+    }, 1000);
+
+    // setInterval(() => {
+    //     rect.height += 1;
+    //     rect.width += 1;
+    // }, 16);
 }
 
 function setupChart(records: DatePrice[]) {
@@ -85,7 +107,7 @@ function setupChart(records: DatePrice[]) {
                     row.date = parseTime(row.date);
                     row.close = parseFloat(row.close);
                 });
-                return <{date: Date, close: number}[]>json;
+                return json as {date: Date, close: number}[];
             })
             .then(records => {
                 chart.title = "Apple's stock price";
@@ -274,15 +296,14 @@ function setupSliderMorph() {
 }
 
 function setupGeoCanvas() {
-    const geoCanvas = d3.select(document.body).append('canvas')
-        .attr('width', 960)
-        .attr('height', 600);
-    canvas.setDevicePixelRatio(geoCanvas.node()!);
-    const ctx = geoCanvas.node()!.getContext('2d')!;
+    const hdpiCanvas = new HdpiCanvas(960, 600);
+    document.body.appendChild(hdpiCanvas.canvas);
+    const ctx = hdpiCanvas.canvas.getContext('2d')!;
+
     const path = d3.geoPath().context(ctx);
 
     ctx.beginPath();
-    path(topojson.mesh(topoUSA));
+    // path(topojson.mesh(topoUSA));
     ctx.stroke();
 }
 
@@ -292,12 +313,9 @@ function setupGlobe() {
         height = 480,
         speed = 1e-2;
 
-    let globeCanvas = d3.select(document.body).append('canvas')
-            .attr('width', 960)
-            .attr('height', 600),
-        ctx = globeCanvas.node()!.getContext('2d')!;
-
-    canvas.setDevicePixelRatio(globeCanvas.node()!);
+    const hdpiCanvas = new HdpiCanvas(960, 600);
+    document.body.appendChild(hdpiCanvas.canvas);
+    const ctx = hdpiCanvas.canvas.getContext('2d')!;
 
     // Create and configure a geographic projection
     let projection = d3.geoOrthographic()
@@ -345,7 +363,7 @@ function setupGlobe() {
 
         // Countries
         ctx.beginPath();
-        pathGenerator(topoGlobe);
+        // pathGenerator(topoGlobe);
         ctx.fillStyle = "#999";
         ctx.fill();
 
