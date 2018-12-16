@@ -18,6 +18,9 @@ export abstract class Node { // window.Node already exists
     }
 
     _children: Node[] = [];
+    get children(): Node[] {
+        return this._children;
+    }
 
     // Used to check for duplicate nodes.
     private childSet = new Set<Node>();
@@ -47,5 +50,43 @@ export abstract class Node { // window.Node already exists
     }
     get dirty(): boolean {
         return this._dirty;
+    }
+
+    // This is all moot because:
+    // DOMMatrix.constructor === SVGMatrix.constructor
+    // even though
+    // DOMMatrix !== SVGMatrix
+    // We can simply use `new DOMMatrix()`, and it's the same thing.
+
+    // private static svg: SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    //
+    // static createSvgMatrix(): SVGMatrix {
+    //     return Node.svg.createSVGMatrix();
+    // }
+    //
+    // static createSvgMatrixFrom(a: number, b: number,
+    //                            c: number, d: number,
+    //                            e: number, f: number): SVGMatrix {
+    //     const m = Node.svg.createSVGMatrix();
+    //     m.a = a;
+    //     m.b = b;
+    //     m.c = c;
+    //     m.d = d;
+    //     m.e = e;
+    //     m.f = f;
+    //     return m;
+    // }
+
+    static createDomMatrix(a: number, b: number,
+                           c: number, d: number,
+                           e: number, f: number): DOMMatrix {
+        const m = new DOMMatrix();
+        m.a = a;
+        m.b = b;
+        m.c = c;
+        m.d = d;
+        m.e = e;
+        m.f = f;
+        return m;
     }
 }

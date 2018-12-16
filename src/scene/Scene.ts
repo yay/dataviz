@@ -1,20 +1,45 @@
 import {HdpiCanvas} from "../HdpiCanvas";
 import {Node} from "./Node";
 import {Path} from "../Path";
+import {PathRect} from "./PathRect";
 
 export class Scene {
     constructor(parent: HTMLElement, width = 800, height = 600) {
-        this._width = width;
-        this._height = height;
-        this.hdpiCanvas = new HdpiCanvas(width, height);
-        this.canvas = this.hdpiCanvas.canvas;
-        this.ctx = this.canvas.getContext('2d')!;
-        parent.appendChild(this.canvas);
+        this.hdpiCanvas = new HdpiCanvas(this._width = width, this._height = height);
+        const canvas = this.hdpiCanvas.canvas;
+        this.ctx = canvas.getContext('2d')!;
+        parent.appendChild(canvas);
+        this.setupListeners(canvas);
     }
 
     private readonly hdpiCanvas: HdpiCanvas;
-    private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
+
+    private setupListeners(canvas: HTMLCanvasElement) {
+        canvas.addEventListener('mousemove', this.onMouseMove);
+    }
+
+    private onMouseMove = (e: MouseEvent) => {
+        const x = e.offsetX;
+        const y = e.offsetY;
+
+        if (this.root) {
+            const rect = this.root as PathRect;
+            if (rect.isPointInPath(this.ctx, x, y)) {
+                rect.fillStyle = 'yellow';
+            }
+            else {
+                rect.fillStyle = 'green';
+            }
+
+            if (rect.isPointInStroke(this.ctx, x, y)) {
+                rect.strokeStyle = 'red';
+            }
+            else {
+                rect.strokeStyle = 'blue';
+            }
+        }
+    };
 
     _width: number;
     get width(): number {
@@ -85,9 +110,22 @@ export class Scene {
     }
 
     render = () => {
-        this.ctx.clearRect(0, 0, this.width + 1, this.height + 1);
+        this.ctx.clearRect(0, 0, this.width, this.height);
         if (this.root) {
             this.root.render(this.ctx);
         }
-    }
+        this.dirty = false;
+    };
+
+    // // Walk the tree depth first and hit test the leafs?
+    // hitTest(x: number, y: number): Node | null {
+    //     if (this.root) {
+    //         const children = this.root.children;
+    //         const n = children.length;
+    //         for (let i = 0; i < n; i++) {
+    //             const child = children[i];
+    //             child.hitTest(x, y);
+    //         }
+    //     }
+    // }
 }

@@ -2,6 +2,15 @@ import { Node } from "./Node";
 import { Path } from "../Path";
 
 export class Rect extends Node {
+
+    _hitTestable = false;
+    set hitTestable(value: boolean) {
+        this._hitTestable = value;
+    }
+    get hitTestable(): boolean {
+        return this._hitTestable;
+    }
+
     protected path = new Path();
 
     _x: number = 0;
@@ -40,9 +49,10 @@ export class Rect extends Node {
         return this._height;
     }
 
-    isHitTestable = false;
-
     updatePath() {
+        // if (!this.path) {
+        //     this.path = new Path();
+        // }
         const path = this.path;
         path.clear();
         path.moveTo(this.x, this.y);
@@ -53,7 +63,7 @@ export class Rect extends Node {
     }
 
     render(ctx: CanvasRenderingContext2D): void {
-        if (this.isHitTestable) {
+        if (this.hitTestable) {
             this.updatePath();
             if (this.scene) {
                 this.scene.appendPath(this.path);

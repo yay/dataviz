@@ -9,9 +9,10 @@ import * as topojson from 'topojson-client';
 import {HdpiCanvas} from "./HdpiCanvas";
 import AnimationQueue from './AnimationQueue';
 import easings from './Easings';
-import './decoratorTest';
+// import './decoratorTest';
 import {Scene} from "./scene/Scene";
 import {Rect} from "./scene/Rect";
+import {PathRect} from "./scene/PathRect";
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -69,15 +70,26 @@ function onDataReady(records: DatePrice[]) {
 
 function testScene() {
     const scene = new Scene(document.body);
+
     const rect = new Rect();
     rect.x = 50;
     rect.y = 50;
-    rect.width = 200;
-    rect.height = 100;
-    scene.root = rect;
+    rect.width = 50;
+    rect.height = 50;
+
+    const pathRect = new PathRect();
+    pathRect.x = 200;
+    pathRect.y = 50;
+    pathRect.width = 50;
+    pathRect.height = 50;
+
+    scene.root = pathRect;
 
     setTimeout(() => {
-        rect.height = 200;
+        pathRect.height = 100;
+        pathRect.fillStyle = 'green';
+        pathRect.strokeStyle = 'blue';
+        pathRect.lineWidth = 4;
     }, 1000);
 
     // setInterval(() => {
@@ -223,7 +235,7 @@ function setupCustomAnimation() {
     function interpolate(t: number) {
         const value = pathInterpolator.compute(a, b, t);
         node.setAttribute('d', pathInterpolator.serve(value));
-    };
+    }
 
     const delay = 1000;
     setTimeout(() => {
