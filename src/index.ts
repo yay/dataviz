@@ -8,7 +8,7 @@ import * as topojson from 'topojson-client';
 // import topoGlobe from '../data/topoGlobe';
 import {HdpiCanvas} from "./HdpiCanvas";
 import AnimationQueue from './AnimationQueue';
-import easings from './Easings';
+// import easings from './Easings';
 // import './decoratorTest';
 import {Scene} from "./scene/Scene";
 import {Rect} from "./scene/Rect";
@@ -71,7 +71,7 @@ function onDataReady(records: DatePrice[]) {
 }
 
 function testScene() {
-    const scene = new Scene(document.body);
+    const scene = new Scene(document.body, 800, 400);
 
     const group = new Group();
 
@@ -87,23 +87,62 @@ function testScene() {
     pathRect.width = 50;
     pathRect.height = 50;
 
-    const arc = new Arc();
-    (window as any).myArc = arc;
-    arc.x = 300;
-    arc.y = 300;
-    arc.lineWidth = 7;
-    arc.radius = 50;
+    // const arc = new Arc();
+    // (window as any).myArc = arc;
+    // arc.x = 300;
+    // arc.y = 300;
+    // arc.lineWidth = 7;
+    // arc.radius = 50;
+    //
+    // group.add(arc, pathRect);
+    //
+    // scene.root = group;
+    //
+    // setTimeout(() => {
+    //     pathRect.height = 100;
+    //     pathRect.fillStyle = 'green';
+    //     pathRect.strokeStyle = 'blue';
+    //     pathRect.lineWidth = 4;
+    // }, 1000);
 
-    group.add(arc, pathRect);
+    const n = 1000;
+    const width = scene.width;
+    const height = scene.height;
+    const arcs: Arc[] = [];
+    const deltas: [number, number][] = [];
+    for (let i = 0; i < n; i++) {
+        const arc = new Arc();
+        arc.x = Math.random() * width;
+        arc.y = Math.random() * height;
+        arc.radius = Math.random() * 2 + 2;
+        arcs.push(arc);
 
+        deltas.push([Math.random() - 0.5, Math.random() - 0.5]);
+    }
+
+    group.add(...arcs);
     scene.root = group;
 
-    setTimeout(() => {
-        pathRect.height = 100;
-        pathRect.fillStyle = 'green';
-        pathRect.strokeStyle = 'blue';
-        pathRect.lineWidth = 4;
-    }, 1000);
+    (function step() {
+        arcs.forEach((arc, i) => {
+            const delta = deltas[i];
+            arc.x += delta[0];
+            arc.y += delta[1];
+            if (arc.x > width) {
+                arc.x -= width;
+            }
+            else if (arc.x < 0) {
+                arc.x += width;
+            }
+            if (arc.y > height) {
+                arc.y -= height;
+            }
+            else if (arc.y < 0) {
+                arc.y += height;
+            }
+        });
+        requestAnimationFrame(step);
+    })();
 
     // setInterval(() => {
     //     rect.height += 1;
@@ -233,39 +272,39 @@ function setupCustomCubicMorph() {
         });
 }
 
-function setupCustomAnimation() {
-    const node: SVGPathElement = d3.select(document.body).append('svg')
-        .attr('width', 480)
-        .attr('height', 320)
-        .append('g').append('path')
-        .attr('d', shapes.circle)
-        .attr('style', shapeStyle).node()!;
-
-    const [a, b] = pathInterpolator.normalize(
-        shapes.circle,
-        shapes.square
-    );
-    function interpolate(t: number) {
-        const value = pathInterpolator.compute(a, b, t);
-        node.setAttribute('d', pathInterpolator.serve(value));
-    }
-
-    const delay = 1000;
-    setTimeout(() => {
-        const duration = 2000; // ms
-        const startTime = Date.now();
-        function onFrame() {
-            const now = Date.now();
-            const t = Math.min(now - startTime, duration) / duration;
-            // interpolate(easings.elasticOut(t));
-            interpolate(easings.bounceOut(t));
-            if (t < 1) {
-                requestAnimationFrame(onFrame);
-            }
-        }
-        requestAnimationFrame(onFrame);
-    }, delay);
-}
+// function setupCustomAnimation() {
+//     const node: SVGPathElement = d3.select(document.body).append('svg')
+//         .attr('width', 480)
+//         .attr('height', 320)
+//         .append('g').append('path')
+//         .attr('d', shapes.circle)
+//         .attr('style', shapeStyle).node()!;
+//
+//     const [a, b] = pathInterpolator.normalize(
+//         shapes.circle,
+//         shapes.square
+//     );
+//     function interpolate(t: number) {
+//         const value = pathInterpolator.compute(a, b, t);
+//         node.setAttribute('d', pathInterpolator.serve(value));
+//     }
+//
+//     const delay = 1000;
+//     setTimeout(() => {
+//         const duration = 2000; // ms
+//         const startTime = Date.now();
+//         function onFrame() {
+//             const now = Date.now();
+//             const t = Math.min(now - startTime, duration) / duration;
+//             // interpolate(easings.elasticOut(t));
+//             interpolate(easings.bounceOut(t));
+//             if (t < 1) {
+//                 requestAnimationFrame(onFrame);
+//             }
+//         }
+//         requestAnimationFrame(onFrame);
+//     }, delay);
+// }
 
 function setupReverseCustomCubicMorph() {
     const svg = d3.select(document.body).append('svg')

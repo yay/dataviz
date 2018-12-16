@@ -79,10 +79,18 @@ export class Arc extends Shape {
     }
 
     render(ctx: CanvasRenderingContext2D): void {
+        // About 15% performance loss for re-creating and retaining a Path2D
+        // object for hit testing.
         this.updatePath();
         this.applyContextAttributes(ctx);
         ctx.fill(this.path);
         ctx.stroke(this.path);
+
+        // this.applyContextAttributes(ctx);
+        // ctx.beginPath();
+        // ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
+        // ctx.fill();
+        // ctx.stroke();
 
         this.dirty = false;
     }

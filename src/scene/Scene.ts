@@ -68,10 +68,10 @@ export class Scene {
 
     _dirty = false;
     set dirty(dirty: boolean) {
-        this._dirty = dirty;
-        if (dirty) {
+        if (dirty && !this._dirty) {
             requestAnimationFrame(this.render);
         }
+        this._dirty = dirty;
     }
     get dirty(): boolean {
         return this._dirty;
@@ -119,7 +119,22 @@ export class Scene {
         }
     }
 
+    _fpsCounter = 0;
+    _now = performance.now();
+
+    logFps() {
+        this._fpsCounter++;
+        const now = performance.now();
+        if (now - this._now > 1000) {
+            this._now = now;
+            console.log('FPS:' + this._fpsCounter);
+            this._fpsCounter = 0;
+        }
+    }
+
     render = () => {
+        this.logFps();
+
         this.ctx.clearRect(0, 0, this.width, this.height);
         if (this.root) {
             this.root.render(this.ctx);
