@@ -1,7 +1,7 @@
 import { Node } from "./Node";
 
-export class Shape extends Node {
-    _fillStyle: string = 'none'; //| CanvasGradient | CanvasPattern;
+export abstract class Shape extends Node {
+    private _fillStyle: string = 'none'; //| CanvasGradient | CanvasPattern;
     set fillStyle(value: string) {
         this._fillStyle = value;
         this.dirty = true;
@@ -10,7 +10,7 @@ export class Shape extends Node {
         return this._fillStyle;
     }
 
-    _strokeStyle: string = 'none';
+    private _strokeStyle: string = 'none';
     set strokeStyle(value: string) {
         this._strokeStyle = value;
         this.dirty = true;
@@ -19,7 +19,7 @@ export class Shape extends Node {
         return this._strokeStyle;
     }
 
-    _lineWidth: number = 1;
+    private _lineWidth: number = 1;
     set lineWidth(value: number) {
         this._lineWidth = value;
         this.dirty = true;
@@ -33,4 +33,7 @@ export class Shape extends Node {
         ctx.strokeStyle = this.strokeStyle;
         ctx.lineWidth = this.lineWidth;
     }
+
+    abstract isPointInPath(ctx: CanvasRenderingContext2D, x: number, y: number): boolean
+    abstract isPointInStroke(ctx: CanvasRenderingContext2D, x: number, y: number): boolean
 }

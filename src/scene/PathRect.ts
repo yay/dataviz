@@ -1,10 +1,10 @@
-import { Shape } from "./Shape";
+import {Shape} from "./Shape";
 
 export class PathRect extends Shape {
 
     protected path = new Path2D();
 
-    _x: number = 0;
+    private _x: number = 0;
     set x(value: number) {
         this._x = value;
         this.dirty = true;
@@ -13,7 +13,7 @@ export class PathRect extends Shape {
         return this._x;
     }
 
-    _y: number = 0;
+    private _y: number = 0;
     set y(value: number) {
         this._y = value;
         this.dirty = true;
@@ -22,7 +22,7 @@ export class PathRect extends Shape {
         return this._y;
     }
 
-    _width: number = 10;
+    private _width: number = 10;
     set width(value: number) {
         this._width = value;
         this.dirty = true;
@@ -31,7 +31,7 @@ export class PathRect extends Shape {
         return this._width;
     }
 
-    _height: number = 10;
+    private _height: number = 10;
     set height(value: number) {
         this._height = value;
         this.dirty = true;

@@ -13,6 +13,8 @@ import easings from './Easings';
 import {Scene} from "./scene/Scene";
 import {Rect} from "./scene/Rect";
 import {PathRect} from "./scene/PathRect";
+import {Arc} from "./scene/Arc";
+import {Group} from "./scene/Group";
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -71,6 +73,8 @@ function onDataReady(records: DatePrice[]) {
 function testScene() {
     const scene = new Scene(document.body);
 
+    const group = new Group();
+
     const rect = new Rect();
     rect.x = 50;
     rect.y = 50;
@@ -83,7 +87,15 @@ function testScene() {
     pathRect.width = 50;
     pathRect.height = 50;
 
-    scene.root = pathRect;
+    const arc = new Arc();
+    (window as any).myArc = arc;
+    arc.x = 300;
+    arc.y = 300;
+    arc.radius = 50;
+
+    group.add(arc, pathRect);
+
+    scene.root = group;
 
     setTimeout(() => {
         pathRect.height = 100;

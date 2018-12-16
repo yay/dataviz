@@ -2,6 +2,7 @@ import {HdpiCanvas} from "../HdpiCanvas";
 import {Node} from "./Node";
 import {Path} from "../Path";
 import {PathRect} from "./PathRect";
+import {Shape} from "./Shape";
 
 export class Scene {
     constructor(parent: HTMLElement, width = 800, height = 600) {
@@ -24,19 +25,21 @@ export class Scene {
         const y = e.offsetY;
 
         if (this.root) {
-            const rect = this.root as PathRect;
-            if (rect.isPointInPath(this.ctx, x, y)) {
-                rect.fillStyle = 'yellow';
-            }
-            else {
-                rect.fillStyle = 'green';
-            }
+            const node = this.root;
+            if (node instanceof Shape) {
+                if (node.isPointInPath(this.ctx, x, y)) {
+                    node.fillStyle = 'yellow';
+                }
+                else {
+                    node.fillStyle = 'green';
+                }
 
-            if (rect.isPointInStroke(this.ctx, x, y)) {
-                rect.strokeStyle = 'red';
-            }
-            else {
-                rect.strokeStyle = 'blue';
+                if (node.isPointInStroke(this.ctx, x, y)) {
+                    node.strokeStyle = 'red';
+                }
+                else {
+                    node.strokeStyle = 'blue';
+                }
             }
         }
     };

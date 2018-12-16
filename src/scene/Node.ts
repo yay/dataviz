@@ -1,15 +1,16 @@
 import {Scene} from "./Scene";
 
 export abstract class Node { // window.Node already exists
-    _scene?: Scene;
+    private _scene?: Scene;
     set scene(value: Scene | undefined) {
         this._scene = value;
+        this.children.forEach(child => child.scene = value);
     }
     get scene(): Scene | undefined {
         return this._scene;
     }
 
-    _parent?: Node;
+    private _parent?: Node;
     set parent(value: Node | undefined) {
         this._parent = value;
     }
@@ -17,7 +18,7 @@ export abstract class Node { // window.Node already exists
         return this._parent;
     }
 
-    _children: Node[] = [];
+    private _children: Node[] = [];
     get children(): Node[] {
         return this._children;
     }
@@ -25,27 +26,35 @@ export abstract class Node { // window.Node already exists
     // Used to check for duplicate nodes.
     private childSet = new Set<Node>();
 
-    add(node: Node) {
-        if (!this.childSet.has(node)) {
-            this._children.push(node);
-            this.childSet.add(node);
-        }
-    }
+    add(...args: Node[]) {
+        args.forEach(node => {
+            if (!this.childSet.has(node)) {
+                this._children.push(node);
+                this.childSet.add(node);
 
-    render(ctx: CanvasRenderingContext2D) {
-        // stable sort by the zIndex before we do this
-        this._children.forEach(child => {
-            child.render(ctx);
+                node.parent = this;
+                node.scene = this.scene;
+            }
+            else {
+                throw new Error(`Duplicate ${node.constructor.name} node: ${node}`);
+            }
         });
     }
 
+    abstract render(ctx: CanvasRenderingContext2D): void
+
     zIndex: number = 0;
 
-    _dirty = false;
+    private _dirty = false;
     set dirty(dirty: boolean) {
         this._dirty = dirty;
-        if (dirty && this.scene) {
-            this.scene.dirty = true;
+        if (dirty) {
+            if (this.parent) {
+                this.parent.dirty = true;
+            }
+            else if (this.scene) {
+                this.scene.dirty = true;
+            }
         }
     }
     get dirty(): boolean {
