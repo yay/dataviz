@@ -47,7 +47,7 @@ export class PathRect extends Shape {
         path.lineTo(this.x + this.width, this.y + this.height);
         path.lineTo(this.x, this.y + this.height);
         path.closePath();
-        const matrix = PathRect.createDomMatrix(2, 0, 0, 1, 20, 20);
+        const matrix = PathRect.createSvgMatrixFrom(2, 0, 0, 1, 20, 20);
         matrix.a = 2;
         matrix.e = 20;
         matrix.f = 20;
@@ -66,6 +66,8 @@ export class PathRect extends Shape {
 
     isPointInPath(ctx: CanvasRenderingContext2D, x: number, y: number): boolean {
         // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath
+        // Hit testing is broken in Firefox 64 - mouse cursor has to be way into the shape
+        // for it to detect either stroke or path hit.
         return ctx.isPointInPath(this.path, x, y);
     }
 

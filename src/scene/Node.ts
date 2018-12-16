@@ -52,30 +52,42 @@ export abstract class Node { // window.Node already exists
         return this._dirty;
     }
 
-    // This is all moot because:
-    // DOMMatrix.constructor === SVGMatrix.constructor
-    // even though
-    // DOMMatrix !== SVGMatrix
-    // We can simply use `new DOMMatrix()`, and it's the same thing.
+    /*
 
-    // private static svg: SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    //
-    // static createSvgMatrix(): SVGMatrix {
-    //     return Node.svg.createSVGMatrix();
-    // }
-    //
-    // static createSvgMatrixFrom(a: number, b: number,
-    //                            c: number, d: number,
-    //                            e: number, f: number): SVGMatrix {
-    //     const m = Node.svg.createSVGMatrix();
-    //     m.a = a;
-    //     m.b = b;
-    //     m.c = c;
-    //     m.d = d;
-    //     m.e = e;
-    //     m.f = f;
-    //     return m;
-    // }
+    DOMMatrix !== SVGMatrix but
+    DOMMatrix.constructor === SVGMatrix.constructor
+
+    This works in Chrome and Safari:
+
+    const p1 = new Path2D();
+    const p2 = new Path2D();
+    const m = new DOMMatrix();
+    p1.addPath(p2, m);
+
+    Firefox - TypeError: Argument 2 of Path2D.addPath does not implement interface SVGMatrix.
+    Edge - doesn't have DOMMatrix.
+    IE11 - game over.
+
+     */
+
+    private static svg: SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    static createSvgMatrix(): SVGMatrix {
+        return Node.svg.createSVGMatrix();
+    }
+
+    static createSvgMatrixFrom(a: number, b: number,
+                               c: number, d: number,
+                               e: number, f: number): SVGMatrix {
+        const m = Node.svg.createSVGMatrix();
+        m.a = a;
+        m.b = b;
+        m.c = c;
+        m.d = d;
+        m.e = e;
+        m.f = f;
+        return m;
+    }
 
     static createDomMatrix(a: number, b: number,
                            c: number, d: number,
