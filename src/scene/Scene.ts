@@ -21,24 +21,31 @@ export class Scene {
     }
 
     private onMouseMove = (e: MouseEvent) => {
-        const x = e.offsetX;
-        const y = e.offsetY;
+        const pixelRatio = this.hdpiCanvas.pixelRatio;
+        const x = e.offsetX * pixelRatio;
+        const y = e.offsetY * pixelRatio;
 
-        if (this.root) {
-            const node = this.root;
-            if (node instanceof Shape) {
-                if (node.isPointInPath(this.ctx, x, y)) {
-                    node.fillStyle = 'yellow';
-                }
-                else {
-                    node.fillStyle = 'green';
-                }
+        const node = this.root;
 
-                if (node.isPointInStroke(this.ctx, x, y)) {
-                    node.strokeStyle = 'red';
-                }
-                else {
-                    node.strokeStyle = 'blue';
+        if (node) {
+            const children = node.children;
+            const n = children.length;
+            for (let i = 0; i < n; i++) {
+                const child = children[i];
+                if (child instanceof Shape) {
+                    if (child.isPointInPath(this.ctx, x, y)) {
+                        child.fillStyle = 'yellow';
+                    }
+                    else {
+                        child.fillStyle = 'green';
+                    }
+
+                    if (child.isPointInStroke(this.ctx, x, y)) {
+                        child.strokeStyle = 'red';
+                    }
+                    else {
+                        child.strokeStyle = 'blue';
+                    }
                 }
             }
         }

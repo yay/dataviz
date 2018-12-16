@@ -66,8 +66,6 @@ export class PathRect extends Shape {
 
     isPointInPath(ctx: CanvasRenderingContext2D, x: number, y: number): boolean {
         // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath
-        // Hit testing is broken in Firefox 64 - mouse cursor has to be way into the shape
-        // for it to detect either stroke or path hit.
         return ctx.isPointInPath(this.path, x, y);
     }
 

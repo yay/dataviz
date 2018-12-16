@@ -91,6 +91,7 @@ function testScene() {
     (window as any).myArc = arc;
     arc.x = 300;
     arc.y = 300;
+    arc.lineWidth = 7;
     arc.radius = 50;
 
     group.add(arc, pathRect);
