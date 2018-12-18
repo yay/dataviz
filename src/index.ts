@@ -67,7 +67,8 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    testScene();
+    // testScene();
+    testD3Scene();
 }
 
 function testScene() {
@@ -148,6 +149,81 @@ function testScene() {
     //     rect.height += 1;
     //     rect.width += 1;
     // }, 16);
+}
+
+function testD3Scene() {
+    const width = 800;
+    const height = 400;
+    let data = [];
+    const n = 1000;
+
+    for (let i = 0; i < n; i++) {
+        data.push({
+            x: width * Math.random(),
+            y: height * Math.random(),
+            dx: Math.random() - 0.5,
+            dy: Math.random() - 0.5
+        });
+    }
+
+    let colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // The 'div' here is some D3 selection of your choosing.
+    let svg = d3.select(document.body).append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    let circles = svg.append('g')
+        .selectAll()
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr('r', 2 + Math.random() * 2)
+        .attr('fill', (d, i) => colorScale(i.toString()))
+        .attr('stroke', 'black');
+
+    let fpsCounter = 0;
+    let startTime = performance.now();
+
+    function logFps() {
+        fpsCounter++;
+        const now = performance.now();
+        if (now - startTime > 1000) {
+            startTime = now;
+            console.log('FPS: ' + fpsCounter);
+            fpsCounter = 0;
+        }
+    }
+
+    const svgEl = svg.node()!;
+    svgEl.addEventListener('mousemove', (e: MouseEvent) => {
+        if (e.target instanceof SVGCircleElement) {
+            d3.select(e.target).attr('fill', 'yellow');
+        }
+    });
+
+    d3.timer(() => {
+        // logFps();
+        circles
+            .attr('cx', d => {
+                d.x += d.dx;
+                if (d.x > width) {
+                    d.x -= width
+                } else if (d.x < 0) {
+                    d.x += width;
+                }
+                return d.x;
+            })
+            .attr('cy', d => {
+                d.y += d.dy;
+                if (d.y > height) {
+                    d.y -= height
+                } else if (d.y < 0) {
+                    d.y += height;
+                }
+                return d.y;
+            });
+    });
 }
 
 function setupChart(records: DatePrice[]) {
