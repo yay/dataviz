@@ -2,9 +2,9 @@ export class FpsCounter {
     constructor(parent?: HTMLElement) {
         if (parent) {
             const el = document.createElement('div');
-            el.style.position = 'absolute';
-            el.style.left = '0px';
-            el.style.top = '0px';
+            // el.style.position = 'absolute';
+            // el.style.left = '0px';
+            // el.style.top = '0px';
             el.style.opacity = '0.8';
             el.style.padding = '5px';
             el.style.color = 'black';

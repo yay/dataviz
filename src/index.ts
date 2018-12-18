@@ -73,6 +73,27 @@ function onDataReady(records: DatePrice[]) {
 }
 
 function testScene() {
+    // Hardware: Intel Core i7-4850HQ, NVIDIA GeForce GT 750M 2GB GDDR5
+    // Software: macOS Mojave 10.14.2, Chrome 71
+
+    // Device Pixel Ratio: 1
+    // FPS: 48
+    // Min: 46
+    // Max: 53
+
+    // Device Pixel Ratio: 2
+    // FPS: 28
+    // Min: 24
+    // Max: 29
+
+    // -------------------------------------------
+
+    // Hardware: iPad Air 2
+    // Software: iOS 12.1.1, Safari:
+    // FPS: 60
+    // Min: 59
+    // Max: 60
+
     const scene = new Scene(document.body, 800, 400);
 
     const group = new Group();
@@ -111,12 +132,15 @@ function testScene() {
     const width = scene.width;
     const height = scene.height;
     const arcs: Arc[] = [];
+    // const arcTpl = new Arc();
     const deltas: [number, number][] = [];
     for (let i = 0; i < n; i++) {
         const arc = new Arc();
+        // Same performance (frame rate) using instances of the same Arc.
+        // const arc = Object.create(arcTpl) as Arc;
         arc.x = Math.random() * width;
         arc.y = Math.random() * height;
-        arc.radius = Math.random() * 2 + 2;
+        arc.radius = 4 + Math.random() * 2;
         arcs.push(arc);
 
         deltas.push([Math.random() - 0.5, Math.random() - 0.5]);
@@ -125,7 +149,10 @@ function testScene() {
     group.add(...arcs);
     scene.root = group;
 
+    const fpsCounter = new FpsCounter(document.body);
+
     (function step() {
+        fpsCounter.countFrame();
         arcs.forEach((arc, i) => {
             const delta = deltas[i];
             arc.x += delta[0];
@@ -143,8 +170,33 @@ function testScene() {
                 arc.y += height;
             }
         });
+        // Manual rendering, without automatically setting the `dirty`
+        // flag on property changes, which triggers a re-render, also
+        // doesn't have any positive effect on frame rates.
+        // scene.render();
         requestAnimationFrame(step);
     })();
+
+    // Chrome's performance profiling shows:
+    // Range: 0 - 6.60 s
+
+    // -- Main --
+    //  951.5 ms - Scripting
+    //   12.3 ms - Rendering
+    //   55.6 ms - Painting
+    // 5539.5 ms - Other
+    //   40.1 ms - Idle
+
+    // -- GPU --
+    // 3212.8 ms - GPU
+    // 3386.2 ms - Idle
+
+    // -- Raster --
+    // Two completely idle rasterizer threads.
+
+    // Regular vs Retina performance:
+    // 1x scaling FPS: 50
+    // 2x scaling FPS: 30
 
     // setInterval(() => {
     //     rect.height += 1;
@@ -153,6 +205,28 @@ function testScene() {
 }
 
 function testD3Scene() {
+    // Hardware: Intel Core i7-4850HQ, NVIDIA GeForce GT 750M 2GB GDDR5
+    // Software: macOS Mojave 10.14.2, Chrome 71
+
+    // Device Pixel Ratio: 1
+    // FPS: 57
+    // Min: 54
+    // Max: 59
+
+    // Device Pixel Ratio: 2
+    // FPS: 57
+    // Min: 54
+    // Max: 59
+
+    // -------------------------------------------
+
+    // Hardware: iPad Air 2
+    // Software: iOS 12.1.1, Safari:
+    // FPS: 23
+    // Min: 19
+    // Max: 23
+
+
     const width = 800;
     const height = 400;
     let data = [];
