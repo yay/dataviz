@@ -68,8 +68,8 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    // testScene();
-    testD3Scene();
+    testScene();
+    // testD3Scene();
 }
 
 function testScene() {
@@ -85,6 +85,11 @@ function testScene() {
     // FPS: 28
     // Min: 24
     // Max: 29
+
+    // Firefox 64, Device Pixel Ratio: 2
+    // FPS: 48
+    // Min: 39
+    // Max: 50
 
     // -------------------------------------------
 
