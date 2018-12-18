@@ -15,6 +15,7 @@ import {Rect} from "./scene/Rect";
 import {PathRect} from "./scene/PathRect";
 import {Arc} from "./scene/Arc";
 import {Group} from "./scene/Group";
+import {FpsCounter} from "./FpsCounter";
 
 document.addEventListener('DOMContentLoaded', main);
 
@@ -178,22 +179,9 @@ function testD3Scene() {
         .data(data)
         .enter()
         .append('circle')
-        .attr('r', 2 + Math.random() * 2)
+        .attr('r', 4 + Math.random() * 2)
         .attr('fill', (d, i) => colorScale(i.toString()))
         .attr('stroke', 'black');
-
-    let fpsCounter = 0;
-    let startTime = performance.now();
-
-    function logFps() {
-        fpsCounter++;
-        const now = performance.now();
-        if (now - startTime > 1000) {
-            startTime = now;
-            console.log('FPS: ' + fpsCounter);
-            fpsCounter = 0;
-        }
-    }
 
     const svgEl = svg.node()!;
     svgEl.addEventListener('mousemove', (e: MouseEvent) => {
@@ -202,8 +190,10 @@ function testD3Scene() {
         }
     });
 
+    const fpsCounter = new FpsCounter(document.body);
+
     d3.timer(() => {
-        // logFps();
+        fpsCounter.countFrame();
         circles
             .attr('cx', d => {
                 d.x += d.dx;
