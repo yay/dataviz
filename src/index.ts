@@ -218,6 +218,11 @@ function testD3Scene() {
     // Min: 54
     // Max: 59
 
+    // Firefox 64, Device Pixel Ratio: 2
+    // FPS: 31
+    // Min: 29
+    // Max: 36
+
     // -------------------------------------------
 
     // Hardware: iPad Air 2
