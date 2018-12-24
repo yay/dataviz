@@ -69,30 +69,39 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    // testScene();
-    testD3Scene();
+    testScene();
+    // testD3Scene();
 }
 
 function testScene() {
     // Canvas
 
     // Hardware: Intel Core i7-4850HQ, NVIDIA GeForce GT 750M 2GB GDDR5
-    // Software: macOS 10.14.2, Chrome 71
+    // Software: macOS 10.14.2
 
-    // Device Pixel Ratio: 1
-    // FPS: 48
-    // Min: 46
-    // Max: 53
+    // Chrome 71, Device Pixel Ratio: 1
+    // FPS: 49
+    // Avg: 53.34
+    // Min: 45
+    // Max: 57
 
-    // Device Pixel Ratio: 2
-    // FPS: 28
-    // Min: 24
-    // Max: 29
+    // Chrome 71, Device Pixel Ratio: 2
+    // FPS: 27
+    // Avg: 29.38
+    // Min: 26
+    // Max: 30
+
+    // Firefox 64, Device Pixel Ratio: 1
+    // FPS: 59
+    // Avg: 59.79
+    // Min: 50
+    // Max: 60
 
     // Firefox 64, Device Pixel Ratio: 2
-    // FPS: 48
+    // FPS: 46
+    // Avg: 48.30
     // Min: 39
-    // Max: 50
+    // Max: 51
 
     // Software: Windows 10 1809 (Parallels 14.1 VM, macOS 10.14.2 host)
 
@@ -239,15 +248,15 @@ function testD3Scene() {
     // SVG
 
     // Hardware: Intel Core i7-4850HQ, NVIDIA GeForce GT 750M 2GB GDDR5
-    // Software: macOS Mojave 10.14.2, Chrome 71
+    // Software: macOS Mojave 10.14.2
 
-    // Device Pixel Ratio: 1
+    // Chrome 71, Device Pixel Ratio: 1
     // FPS: 60
     // Avg: 58.40
     // Min: 54
     // Max: 60
 
-    // Device Pixel Ratio: 2
+    // Chrome 71, Device Pixel Ratio: 2
     // FPS: 58
     // Avg: 58.75
     // Min: 53
