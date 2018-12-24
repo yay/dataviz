@@ -69,8 +69,8 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    testScene();
-    // testD3Scene();
+    // testScene();
+    testD3Scene();
 }
 
 function testScene() {
@@ -242,19 +242,28 @@ function testD3Scene() {
     // Software: macOS Mojave 10.14.2, Chrome 71
 
     // Device Pixel Ratio: 1
-    // FPS: 57
+    // FPS: 60
+    // Avg: 58.40
     // Min: 54
-    // Max: 59
+    // Max: 60
 
     // Device Pixel Ratio: 2
-    // FPS: 57
-    // Min: 54
-    // Max: 59
+    // FPS: 58
+    // Avg: 58.75
+    // Min: 53
+    // Max: 60
+
+    // Firefox 64, Device Pixel Ratio: 1
+    // FPS: 48
+    // Avg: 48.52
+    // Min: 39
+    // Max: 60
 
     // Firefox 64, Device Pixel Ratio: 2
-    // FPS: 31
-    // Min: 29
-    // Max: 36
+    // FPS: 40
+    // Avg: 40.70
+    // Min: 38
+    // Max: 40
 
     // Software: Windows 10 1809 (Parallels 14.1 VM, macOS 10.14.2 host)
 
