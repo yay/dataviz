@@ -19,6 +19,8 @@ export class FpsCounter {
     private start = performance.now();
     private minFps = Infinity;
     private maxFps = 0;
+    private fpsSum = 0;
+    private fpsSamples = 0;
     private readonly fpsElement?: HTMLElement;
 
     countFrame() {
@@ -31,10 +33,15 @@ export class FpsCounter {
             if (fps < this.minFps) {
                 this.minFps = fps;
             }
+
+            this.fpsSum += this.fps;
+            this.fpsSamples++;
+            const avgFps = (this.fpsSum / this.fpsSamples).toFixed(2);
+
             if (this.fpsElement) {
-                this.fpsElement.innerText = `FPS: ${fps}\nMin: ${this.minFps}\nMax: ${this.maxFps}`;
+                this.fpsElement.innerText = `FPS: ${fps}\nAvg: ${avgFps}\nMin: ${this.minFps}\nMax: ${this.maxFps}`;
             } else {
-                console.log(`FPS: ${fps}, Min: ${this.minFps}, Max: ${this.maxFps}`);
+                console.log(`FPS: ${fps}, Avg: ${avgFps}, Min: ${this.minFps}, Max: ${this.maxFps}`);
             }
 
             this.fps = 0;

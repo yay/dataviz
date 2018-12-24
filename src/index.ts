@@ -58,6 +58,7 @@ function main() {
 }
 
 function onDataReady(records: DatePrice[]) {
+    (window as any).d3 = d3;
     // setupChart(records);
     // setupD3Morph();
     // setupCustomMorph();
@@ -68,13 +69,15 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    testScene();
-    // testD3Scene();
+    // testScene();
+    testD3Scene();
 }
 
 function testScene() {
+    // Canvas
+
     // Hardware: Intel Core i7-4850HQ, NVIDIA GeForce GT 750M 2GB GDDR5
-    // Software: macOS Mojave 10.14.2, Chrome 71
+    // Software: macOS 10.14.2, Chrome 71
 
     // Device Pixel Ratio: 1
     // FPS: 48
@@ -90,6 +93,23 @@ function testScene() {
     // FPS: 48
     // Min: 39
     // Max: 50
+
+    // Software: Windows 10 1809 (Parallels 14.1 VM, macOS 10.14.2 host)
+
+    // Chrome 71, Device Pixel Ratio: 1
+    // FPS: 46
+    // Min: 29
+    // Max: 47
+
+    // Chrome 71, Device Pixel Ratio: 2
+    // FPS: 20
+    // Min: 13
+    // Max: 23
+
+    // Firefox 64, Device Pixel Ratio: 2
+    // FPS: 37
+    // Min: 18
+    // Max: 39
 
     // -------------------------------------------
 
@@ -210,6 +230,8 @@ function testScene() {
 }
 
 function testD3Scene() {
+    // SVG
+
     // Hardware: Intel Core i7-4850HQ, NVIDIA GeForce GT 750M 2GB GDDR5
     // Software: macOS Mojave 10.14.2, Chrome 71
 
@@ -227,6 +249,20 @@ function testD3Scene() {
     // FPS: 31
     // Min: 29
     // Max: 36
+
+    // Software: Windows 10 1809 (Parallels 14.1 VM, macOS 10.14.2 host)
+
+    // Chrome 71, Device Pixel Ratio: 2
+    // FPS: 22
+    // Avg: 21.70
+    // Min: 18
+    // Max: 23
+
+    // Firefox 64, Device Pixel Ratio: 2
+    // FPS: 37
+    // Avg: 37.79
+    // Min: 32
+    // Max: 39
 
     // -------------------------------------------
 
