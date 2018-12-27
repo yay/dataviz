@@ -33,7 +33,9 @@ function csvToJson(text: string): any[] {
         const cells = line.split(',');
         const row: any = {};
         for (let i = 0; i < columnCount; i++) {
-            row[columns[i]] = cells[i];
+            const cell = cells[i];
+            const number = +cell;
+            row[columns[i]] = isNaN(number) ? cell : number;
         }
         rows.push(row);
     }
@@ -42,6 +44,25 @@ function csvToJson(text: string): any[] {
 
 type DatePrice = {date: Date, price: number};
 const parseTime = timeParse('%Y-%m-%d');
+
+function download(data: any, name: string = 'download.txt') {
+    const a = document.createElement('a');
+    const blob = new Blob([data], {
+        type : 'text/plain;charset=utf-8'
+    });
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function testDownload() {
+    fetch('https://vizhub.com/curran/datasets/auto-mpg.csv')
+        .then(response => response.text())
+        .then(text => csvToJson(text))
+        .then(json => download(JSON.stringify(json, null, 4)));
+}
 
 function main() {
     fetch('../data/gold.csv')
@@ -69,7 +90,7 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    testScene();
+    // testScene();
     // testD3Scene();
 }
 
