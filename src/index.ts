@@ -92,6 +92,21 @@ function onDataReady(records: DatePrice[]) {
     // setupGlobe();
     testScene();
     // testD3Scene();
+
+    const arc = new Arc();
+    arc.fillStyle = 'red';
+    arc.strokeStyle = 'black';
+    arc.lineWidth = 3;
+
+    console.log(arc.fillStyle);
+    console.log(arc.strokeStyle);
+    console.log(arc.lineWidth);
+
+    arc.restoreOwnDefaults();
+
+    console.log(arc.fillStyle);
+    console.log(arc.strokeStyle);
+    console.log(arc.lineWidth);
 }
 
 function testScene() {

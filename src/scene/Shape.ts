@@ -1,19 +1,28 @@
 import { Node } from "./Node";
+import {chainObjects} from "./Helpers";
 
 export abstract class Shape extends Node {
-    private static defaults = {
+    protected static defaults = chainObjects(null, {
         fillStyle: 'none',
         strokeStyle: 'none',
         lineWidth: 1
-    } as any;
+    });
 
-    restoreDefaults() {
-        const defaults = Shape.defaults;
+    restoreOwnDefaults() {
+        const defaults = (this.constructor as any).defaults;
 
         for (const property in defaults) {
             if (defaults.hasOwnProperty(property)) {
                 (this as any)[property] = defaults[property];
             }
+        }
+    }
+
+    restoreAllDefaults() {
+        const defaults = (this.constructor as any).defaults;
+
+        for (const property in defaults) {
+            (this as any)[property] = defaults[property];
         }
     }
 
@@ -26,7 +35,7 @@ export abstract class Shape extends Node {
         return this._fillStyle;
     }
 
-    private _strokeStyle: string = 'none';
+    private _strokeStyle: string = Shape.defaults.strokeStyle;
     set strokeStyle(value: string) {
         this._strokeStyle = value;
         this.dirty = true;
@@ -35,7 +44,7 @@ export abstract class Shape extends Node {
         return this._strokeStyle;
     }
 
-    private _lineWidth: number = 1;
+    private _lineWidth: number = Shape.defaults.lineWidth;
     set lineWidth(value: number) {
         this._lineWidth = value;
         this.dirty = true;

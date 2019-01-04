@@ -1,16 +1,28 @@
 import {Shape} from "./Shape";
+import {chainObjects} from "./Helpers";
 
 export class Arc extends Shape {
 
+    protected static defaults = chainObjects(Shape.defaults, {
+        fillStyle: 'red',
+        strokeStyle: 'black',
+        x: 0,
+        y: 0,
+        radius: 10,
+        startAngle: 0,
+        endAngle: Math.PI * 2,
+        anticlockwise: false
+    });
+
     constructor() {
         super();
-        this.fillStyle = 'red';
-        this.strokeStyle = 'black';
+        this.fillStyle = Arc.defaults.fillStyle;
+        this.strokeStyle = Arc.defaults.strokeStyle;
     }
 
     protected path = new Path2D();
 
-    private _x: number = 0;
+    private _x: number = Arc.defaults.x;
     set x(value: number) {
         this._x = value;
         this.dirty = true;
@@ -19,7 +31,7 @@ export class Arc extends Shape {
         return this._x;
     }
 
-    private _y: number = 0;
+    private _y: number = Arc.defaults.y;
     set y(value: number) {
         this._y = value;
         this.dirty = true;
@@ -28,7 +40,7 @@ export class Arc extends Shape {
         return this._y;
     }
 
-    private _radius: number = 10;
+    private _radius: number = Arc.defaults.radius;
     set radius(value: number) {
         this._radius = value;
         this.dirty = true;
@@ -37,7 +49,7 @@ export class Arc extends Shape {
         return this._radius;
     }
 
-    private _startAngle: number = 0;
+    private _startAngle: number = Arc.defaults.startAngle;
     set startAngle(value: number) {
         this._startAngle = value;
         this.dirty = true;
@@ -46,7 +58,7 @@ export class Arc extends Shape {
         return this._startAngle;
     }
 
-    private _endAngle: number = Math.PI * 2;
+    private _endAngle: number = Arc.defaults.endAngle;
     set endAngle(value: number) {
         this._endAngle = value;
         this.dirty = true;
@@ -55,7 +67,7 @@ export class Arc extends Shape {
         return this._endAngle;
     }
 
-    private _anticlockwise: boolean = false;
+    private _anticlockwise: boolean = Arc.defaults.anticlockwise;
     set anticlockwise(value: boolean) {
         this._anticlockwise = value;
         this.dirty = true;
