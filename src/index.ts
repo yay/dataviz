@@ -90,7 +90,7 @@ function onDataReady(records: DatePrice[]) {
     // setupSliderMorph();
     // setupGeoCanvas();
     // setupGlobe();
-    // testScene();
+    testScene();
     // testD3Scene();
 }
 
@@ -192,22 +192,41 @@ function testScene() {
     const n = 1000;
     const width = scene.width;
     const height = scene.height;
-    const arcs: Arc[] = [];
+
+
+    // const arcs: Arc[] = [];
+    // // const arcTpl = new Arc();
+    // const deltas: [number, number][] = [];
+    // for (let i = 0; i < n; i++) {
+    //     const arc = new Arc();
+    //     // Same performance (frame rate) using instances of the same Arc.
+    //     // const arc = Object.create(arcTpl) as Arc;
+    //     arc.x = Math.random() * width;
+    //     arc.y = Math.random() * height;
+    //     arc.radius = 4 + Math.random() * 2;
+    //     arcs.push(arc);
+    //
+    //     deltas.push([Math.random() - 0.5, Math.random() - 0.5]);
+    // }
+    // group.add(...arcs);
+
+    // -------------------------------------
+    const arcs: Rect[] = [];
     // const arcTpl = new Arc();
     const deltas: [number, number][] = [];
     for (let i = 0; i < n; i++) {
-        const arc = new Arc();
+        const arc = new Rect();
         // Same performance (frame rate) using instances of the same Arc.
         // const arc = Object.create(arcTpl) as Arc;
         arc.x = Math.random() * width;
         arc.y = Math.random() * height;
-        arc.radius = 4 + Math.random() * 2;
         arcs.push(arc);
 
         deltas.push([Math.random() - 0.5, Math.random() - 0.5]);
     }
-
     group.add(...arcs);
+    // -------------------------------------
+
     scene.root = group;
 
     const fpsCounter = new FpsCounter(document.body);

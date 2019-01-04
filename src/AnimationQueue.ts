@@ -53,7 +53,7 @@ const AnimationQueue = {
     _invoke(item: IArguments) {
         let fn: {(): void} | string = item[0];
         const scope: any = item[1];
-        const args: any[] = item[2];
+        const args: [] = item[2];
 
         if (scope && typeof fn === 'string') {
             fn = scope[fn];

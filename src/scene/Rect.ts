@@ -3,7 +3,7 @@ import { Path } from "../Path";
 
 export class Rect extends Node {
 
-    _hitTestable = false;
+    _hitTestable = true;
     set hitTestable(value: boolean) {
         this._hitTestable = value;
     }
@@ -55,10 +55,11 @@ export class Rect extends Node {
         // }
         const path = this.path;
         path.clear();
-        path.moveTo(this.x, this.y);
-        path.lineTo(this.x + this.width, this.y);
-        path.lineTo(this.x + this.width, this.y + this.height);
-        path.lineTo(this.x, this.y + this.height);
+        path.cubicArc(this.x, this.y, 5, 5, 0, 0, Math.PI * 2, 0);
+        // path.moveTo(this.x, this.y);
+        // path.lineTo(this.x + this.width, this.y);
+        // path.lineTo(this.x + this.width, this.y + this.height);
+        // path.lineTo(this.x, this.y + this.height);
         path.closePath();
     }
 

@@ -1,7 +1,23 @@
 import { Node } from "./Node";
 
 export abstract class Shape extends Node {
-    private _fillStyle: string = 'none'; //| CanvasGradient | CanvasPattern;
+    private static defaults = {
+        fillStyle: 'none',
+        strokeStyle: 'none',
+        lineWidth: 1
+    } as any;
+
+    restoreDefaults() {
+        const defaults = Shape.defaults;
+
+        for (const property in defaults) {
+            if (defaults.hasOwnProperty(property)) {
+                (this as any)[property] = defaults[property];
+            }
+        }
+    }
+
+    private _fillStyle: string = Shape.defaults.fillStyle; //| CanvasGradient | CanvasPattern;
     set fillStyle(value: string) {
         this._fillStyle = value;
         this.dirty = true;

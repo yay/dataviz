@@ -5,7 +5,7 @@ function classDecorator<T extends {new(...args:any[]):{}}>(constructor:T) {
     }
 }
 
-@classDecorator
+// @classDecorator // SyntaxError: Support for the experimental syntax 'decorators-legacy' isn't currently enabled
 class Greeter {
     property = 'property';
     hello: string;
